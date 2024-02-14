@@ -1,0 +1,30 @@
+service: authors-service
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  timeout: 15
+  region: sa-east-1 # --> usar la q sea necesaria
+  stage: dev
+  httpApi:
+    id: ylmkjore16
+
+package:
+  patterns:
+    - '!**/**' # <-- ignoro todo por defecto
+    - dist/** # <-- solamente incluye la carpeta dist para hacer el empaquetado
+
+functions:
+  main:
+    handler: dist/main.handler
+    url: true
+    events:
+      - httpApi:
+          method: ANY
+          path: /authors
+      - httpApi:
+          method: ANY
+          path: '/authors/{proxy+}'
+
+plugins:
+  - serverless-offline
