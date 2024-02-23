@@ -6,11 +6,9 @@ import Joi from 'joi';
   imports: [
     NestConfigModule.forRoot({
       validationSchema: Joi.object({
-        PORT: Joi.number().required(),
         MONGO_URI: Joi.string().required(),
-        DB_NAME: Joi.string().required(),
-        DB_PORT: Joi.number().required(),
-        POSTS_API_URL: Joi.string().required(),
+        NODE_ENV: Joi.string().valid('prod', 'dev').required(),
+        SERVER_MODE: Joi.string().valid('http', 'serverless').required(),
       }),
     }),
   ],

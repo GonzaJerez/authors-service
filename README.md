@@ -1,73 +1,51 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# AUTHORS MICROSERVICE
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Instalaciones necesarias
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Asegurarse de tener instalado en su sistema:
 
-## Description
+- pnpm -> `pnpm i -g pnpm`
+- serverless -> `pnpm i -g serverless`
+- docker -> https://docs.docker.com/engine/install/
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Levantar entorno local
 
-## Installation
+#### Variables de entorno
 
-```bash
-$ pnpm install
-```
+Copiar archivo ".env.example" a ".env" y configurar las variables de entorno _en caso de ser necesario_
 
-## Running the app
+#### Levantar base de datos local
 
-```bash
-# development
-$ pnpm run start
+    pnpm db:up
 
-# watch mode
-$ pnpm run start:dev
+#### Levantar servidor http en desarrollo
 
-# production mode
-$ pnpm run start:prod
-```
+    pnpm start:dev
 
-## Test
+#### Levantar serverless en desarrollo
 
-```bash
-# unit tests
-$ pnpm run test
+    pnpm sls:dev
 
-# e2e tests
-$ pnpm run test:e2e
+## Eliminar base de datos local
 
-# test coverage
-$ pnpm run test:cov
-```
+    pnpm db:down
 
-## Support
+## Despliegue a produccion (AWS)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+#### Variables de entorno
 
-## Stay in touch
+> Asegurarse de tener instalado el cli de AWS, si no lo tiene instalado descarguelo y configure un usuario para usar el CLI local
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+#### Variables de entorno
 
-## License
+> Debe tener creada una base de datos de mongo, en mi caso la cree en [Mongo Atlas](https://account.mongodb.com/) y crear un usuario para poder usar esta base de datos ("Security" -> "Database Access" -> "Add new database user" -> _Crea nombre de usuario con contraseña_ -> "Role"="Atlas admin" -> "Restrict Access to Specific Clusters/Federated Database Instances/Stream Processing Instances"=_selecciona db creada_).
 
-Nest is [MIT licensed](LICENSE).
+Crear archivo `.env.prod` y configurar las variables de entorno necesarias para produccion
+
+- MONGO_URI=... (string de conexion a base de datos de MongoDB con su nombre de usuario y contraseña)
+- NODE_ENV=prod
+- SERVER_MODE=serverless
+
+#### Deploy
+
+    pnpm sls:prod

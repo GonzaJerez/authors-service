@@ -1,0 +1,35 @@
+service: authors-service
+
+provider:
+  name: aws
+  region: sa-east-1
+  stage: dev
+  environment:
+    SERVER_MODE: serverless
+
+package:
+  patterns:
+    - '!**/**'
+    - dist/main.js
+
+functions:
+  main:
+    handler: dist/main.handler
+    url: true
+    runtime: nodejs20.x
+    timeout: 15
+    events:
+      - httpApi:
+          path: /
+          method: ANY
+      - httpApi:
+          path: '/{proxy+}'
+          method: ANY
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 4010
+    lambdaPort: 4012

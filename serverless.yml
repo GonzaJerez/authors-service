@@ -2,29 +2,27 @@ service: authors-service
 
 provider:
   name: aws
-  runtime: nodejs20.x
-  timeout: 15
-  region: sa-east-1 # --> usar la q sea necesaria
-  stage: dev
-  httpApi:
-    id: ylmkjore16
+  region: sa-east-1
+  stage: prod
+
+useDotenv: true
 
 package:
   patterns:
-    - '!**/**' # <-- ignoro todo por defecto
-    - dist/** # <-- solamente incluye la carpeta dist para hacer el empaquetado
+    - '!**/**'
+    - dist/main.js
 
 functions:
   main:
     handler: dist/main.handler
+    name: authors-service
     url: true
-    events:
-      - httpApi:
-          method: ANY
-          path: /authors
-      - httpApi:
-          method: ANY
-          path: '/authors/{proxy+}'
+    runtime: nodejs20.x
+    timeout: 15
+    environment:
+      MONGO_URI: ${env:MONGO_URI}
+      NODE_ENV: ${env:NODE_ENV}
+      SERVER_MODE: ${env:SERVER_MODE}
 
 plugins:
   - serverless-offline
