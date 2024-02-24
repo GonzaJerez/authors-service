@@ -14,11 +14,6 @@ export class Author extends Document {
 
   @Prop()
   last_name: string;
-
-  @Prop({
-    type: [String],
-  })
-  posts: string[];
 }
 
 export const AuthorSchema = SchemaFactory.createForClass(Author);
