@@ -10,7 +10,7 @@ import { IPost } from '../types/posts.types';
   },
 })
 export class Author {
-  @Prop({ type: SchemaTypes.ObjectId })
+  @Prop({ type: SchemaTypes.ObjectId, auto: true })
   _id: Types.ObjectId;
 
   @Prop()
