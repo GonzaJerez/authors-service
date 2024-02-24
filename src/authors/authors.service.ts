@@ -24,7 +24,7 @@ export class AuthorsService {
     const query: FilterQuery<Author> = {};
 
     if (idsAuthors?.length > 0) {
-      query._id = { $in: idsAuthors };
+      query['_id'] = { $in: idsAuthors };
     }
     return this.authorModel.find(query).lean();
   }
