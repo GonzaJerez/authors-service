@@ -13,7 +13,8 @@ export class AuthorsController {
   }
 
   @Get()
-  findAll(@Query() filters: AuthorFilterDto) {
-    return this.authorsService.findAll(filters);
+  async findAll(@Query() filters: AuthorFilterDto) {
+    const authors = await this.authorsService.findAll(filters);
+    return { authors };
   }
 }
