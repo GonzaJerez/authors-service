@@ -9,6 +9,7 @@ import Joi from 'joi';
         MONGO_URI: Joi.string().required(),
         NODE_ENV: Joi.string().valid('prod', 'dev').required(),
         SERVER_MODE: Joi.string().valid('http', 'serverless').required(),
+        POSTS_API_URL: Joi.string().required(),
       }),
     }),
   ],
