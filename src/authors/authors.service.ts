@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 
 import { Author } from './entities/author.entity';
 import { AuthorFilterDto } from './dto/author-filter.dto';
@@ -19,12 +19,12 @@ export class AuthorsService {
   }
 
   async findAll(filters: AuthorFilterDto): Promise<Author[]> {
-    const idsPosts = filters.posts?.split(',');
+    const idsAuthors = filters.authors?.split(',');
 
-    const query = {};
+    const query: FilterQuery<Author> = {};
 
-    if (idsPosts?.length > 0) {
-      query['posts'] = { $in: idsPosts };
+    if (idsAuthors?.length > 0) {
+      query._id = { $in: idsAuthors };
     }
     return this.authorModel.find(query).lean();
   }
