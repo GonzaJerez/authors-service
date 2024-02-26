@@ -31,7 +31,6 @@ functions:
       MONGO_URI: ${env:MONGO_URI}
       NODE_ENV: ${env:NODE_ENV}
       SERVER_MODE: ${env:SERVER_MODE}
-      POSTS_FUNCTION_NAME: ${env:POSTS_FUNCTION_NAME}
 
 plugins:
   - serverless-offline

@@ -54,7 +54,7 @@ export class AuthorsService {
         posts?: IPost[];
       };
       if (this.configService.get('NODE_ENV') === 'prod') {
-        resp = await this.invokeLambda();
+        resp = await this.invokeLambda(`authors=${authorsIds.join(',')}`);
       } else {
         resp = await fetch(
           `${this.configService.get('POSTS_API_URL')}?authors=${authorsIds.join(
@@ -89,7 +89,7 @@ export class AuthorsService {
     return authorsWithPosts;
   }
 
-  private async invokeLambda() {
+  private async invokeLambda(queryString = '') {
     const client = new LambdaClient();
     const command = new InvokeCommand({
       FunctionName: this.configService.get('POSTS_FUNCTION_NAME'),
@@ -97,12 +97,12 @@ export class AuthorsService {
         version: '2.0',
         routeKey: '$default',
         rawPath: '/posts',
-        rawQueryString: '',
+        rawQueryString: queryString,
         headers: {},
         requestContext: {
           http: {
             method: 'GET',
-            path: '/posts',
+            path: `/posts?${queryString}`,
             protocol: 'HTTP/1.1',
           },
         },
