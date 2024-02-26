@@ -32,8 +32,6 @@ Renombrar archivo ".env.example" a ".env" y configurar las variables de entorno 
 
 ## Despliegue a produccion (AWS)
 
-#### Variables de entorno
-
 > Asegurarse de tener instalado el cli de AWS, si no lo tiene instalado descarguelo y configure un usuario para usar el CLI local
 
 #### Variables de entorno
@@ -48,6 +46,12 @@ Crear archivo `.env.prod` y configurar las variables de entorno necesarias para 
 - POSTS_FUNCTION_NAME= (Si ya se sabe el nombre de la lambda de posts agregarlo en este archivo, sino configurarlo despues en consola de aws)
 
 > Una vez desplegado este servicio configurar los permisos de la lambda de "posts" para que esta lambda pueda ejecutarla.
+
+#### API Gateway
+
+Antes de hacer el despliegue crear una api gateway simple, sin ninguna ruta ni conexiones a ninguna lambda y con el stage "$default".
+
+Tengo que copiarme el id de la api gateway para agregarlo al archivo `serverless.yml`.
 
 #### Deploy
 

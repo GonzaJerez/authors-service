@@ -4,6 +4,8 @@ provider:
   name: aws
   region: sa-east-1
   stage: prod
+  httpApi:
+    id: ${env:API_GATEWAY_ID}
 
 useDotenv: true
 
@@ -16,13 +18,20 @@ functions:
   main:
     handler: dist/main.handler
     name: authors-service
-    url: true
     runtime: nodejs20.x
     timeout: 15
+    events:
+      - httpApi:
+          path: '/authors'
+          method: ANY
+      - httpApi:
+          path: '/authors/{proxy+}'
+          method: ANY
     environment:
       MONGO_URI: ${env:MONGO_URI}
       NODE_ENV: ${env:NODE_ENV}
       SERVER_MODE: ${env:SERVER_MODE}
+      POSTS_FUNCTION_NAME: ${env:POSTS_FUNCTION_NAME}
 
 plugins:
   - serverless-offline
