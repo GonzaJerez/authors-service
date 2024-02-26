@@ -45,7 +45,9 @@ Crear archivo `.env.prod` y configurar las variables de entorno necesarias para 
 - MONGO_URI=... (string de conexion a base de datos de MongoDB con su nombre de usuario y contraseña)
 - NODE_ENV=prod
 - SERVER_MODE=serverless
-- POSTS_API_URL= (Si ya se sabe la url del microservicio de posts agregarlo en este archivo, sino configurarlo despues en consola de aws)
+- POSTS_FUNCTION_NAME= (Si ya se sabe el nombre de la lambda de posts agregarlo en este archivo, sino configurarlo despues en consola de aws)
+
+> Una vez desplegado este servicio configurar los permisos de la lambda de "posts" para que esta lambda pueda ejecutarla.
 
 #### Deploy
 

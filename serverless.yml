@@ -10,7 +10,7 @@ useDotenv: true
 package:
   patterns:
     - '!**/**'
-    - dist/main.js
+    - dist/**
 
 functions:
   main:
