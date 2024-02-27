@@ -90,6 +90,14 @@ export class AuthorsService {
   }
 
   private async invokeLambda(queryString = '') {
+    const queryStringParameters: Record<string, string> = {};
+
+    const params = queryString.split('&');
+    for (const param of params) {
+      const [key, value] = param.split('=');
+      queryStringParameters[key] = value;
+    }
+
     const client = new LambdaClient();
     const command = new InvokeCommand({
       FunctionName: this.configService.get('POSTS_FUNCTION_NAME'),
@@ -98,6 +106,7 @@ export class AuthorsService {
         routeKey: '$default',
         rawPath: '/posts',
         rawQueryString: queryString,
+        queryStringParameters,
         headers: {},
         requestContext: {
           http: {
