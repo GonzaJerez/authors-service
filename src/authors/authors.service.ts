@@ -64,9 +64,9 @@ export class AuthorsService {
         resp = await this.invokeLambda(`authors=${authorsIds.join(',')}`);
       } else {
         resp = await fetch(
-          `${this.configService.get('POSTS_API_URL')}?authors=${authorsIds.join(
-            ',',
-          )}`,
+          `${this.configService.getOrThrow(
+            'POSTS_API_URL',
+          )}?authors=${authorsIds.join(',')}`,
         ).then((res) => res.json());
       }
       if (!resp.posts)
@@ -107,7 +107,7 @@ export class AuthorsService {
 
     const client = new LambdaClient();
     const command = new InvokeCommand({
-      FunctionName: this.configService.get('POSTS_FUNCTION_NAME'),
+      FunctionName: this.configService.getOrThrow('POSTS_FUNCTION_NAME'),
       Payload: JSON.stringify({
         version: '2.0',
         routeKey: '$default',
