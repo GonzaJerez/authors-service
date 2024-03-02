@@ -19,6 +19,9 @@ export class Author {
   @Prop()
   last_name: string;
 
+  @Prop()
+  image_url: string;
+
   posts?: IPost[];
 }
 

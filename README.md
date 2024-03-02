@@ -8,6 +8,14 @@ Asegurarse de tener instalado en su sistema:
 - serverless -> `pnpm i -g serverless`
 - docker -> https://docs.docker.com/engine/install/
 
+## Prerequisitos
+
+Un bucket S3 de destino. Este bucket debe tener acceso publico (Habilitar acceso publico y ademas establecer politicas para este acceso publico)
+
+Tener un usuario IAM en aws con los permisos para subir imagenes a un bucket S3, las keys de este usuario son necesarias para el sdk usado en el codigo.
+
+Permisos que debe tener: _putObject_
+
 ## Levantar entorno local
 
 #### Variables de entorno
