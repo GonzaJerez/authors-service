@@ -31,6 +31,7 @@ functions:
       MONGO_URI: ${env:MONGO_URI}
       NODE_ENV: prod
       SERVER_MODE: serverless
+      POSTS_FUNCTION_NAME: ${env:POSTS_FUNCTION_NAME}
       AWS_BUCKET_NAME: ${env:AWS_BUCKET_NAME}
       AWS_BUCKET_REGION: ${env:AWS_BUCKET_REGION}
 

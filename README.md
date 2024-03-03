@@ -46,6 +46,9 @@ Renombrar archivo ".env.example" a ".env" y configurar las variables de entorno 
 
     pnpm sls:dev
 
+> [WARNING]
+> En modo serverless en local no funciona la subida de archivos a S3
+
 ## Eliminar base de datos local
 
     pnpm db:down
