@@ -12,7 +12,9 @@ Asegurarse de tener instalado en su sistema:
 
 ### AWS CLI (prod)
 
+> [INFO]
 > Asegurarse de tener instalado el cli de AWS, si no lo tiene instalado descarguelo y configure un usuario para usar el CLI local
+> Para utilizar los distintos servicios de aws como la invocación de lambdas o subida de imagenes a S3 pero corriendo el proyecto de forma local, este usuario de AWS CLI debe tener por lo menos esos permisos
 
 ### S3 (dev & prod)
 
