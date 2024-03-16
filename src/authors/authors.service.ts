@@ -72,9 +72,7 @@ export class AuthorsService {
     if (operation === 'CREATE') increment += 1;
     if (operation === 'DELETE') increment -= 1;
 
-    console.log({ increment });
-
-    const authorUpdated = await this.authorModel.findByIdAndUpdate(
+    await this.authorModel.findByIdAndUpdate(
       post.author,
       {
         $inc: {
@@ -83,8 +81,6 @@ export class AuthorsService {
       },
       { new: true },
     );
-
-    console.log({ authorUpdated });
   }
 
   async notifyPostsService(author: Author) {

@@ -16,9 +16,13 @@ Asegurarse de tener instalado en su sistema:
 > Asegurarse de tener instalado el cli de AWS, si no lo tiene instalado descarguelo y configure un usuario para usar el CLI local
 > Para utilizar los distintos servicios de aws como la invocación de lambdas o subida de imagenes a S3 pero corriendo el proyecto de forma local, este usuario de AWS CLI debe tener por lo menos esos permisos
 
-### S3 (dev & prod)
+### S3 (prod)
 
 Un bucket S3 de destino. Este bucket debe tener acceso publico (Habilitar acceso publico y ademas establecer politicas para este acceso publico)
+
+### SQS
+
+Una cola donde se reciban todos los eventos que le interesan a este servicio. Para el ejemplo se configuro un SQS de tipo "fifo".
 
 ### API Gateway (prod)
 
@@ -63,7 +67,8 @@ Crear archivo `.env.prod` y configurar las variables de entorno necesarias para 
 
 - MONGO_URI=... (string de conexion a base de datos de MongoDB con su nombre de usuario y contraseña)
 - API_GATEWAY_ID= (id de api gateway creado)
-- POSTS_FUNCTION_NAME= (Si ya se sabe el nombre de la lambda de posts agregarlo en este archivo, sino configurarlo despues en consola de aws)
+- SQS_QUEUE_ARN= (arn de la cola de sqs que le emite eventos a esta lambda)
+- POSTS_QUEUE_URL= (URL de la queue del servicio de posts para poder enviarle mensajes)
 - AWS_BUCKET_NAME= (nombre del bucket de s3 al que se van a subir los archivos)
 - AWS_BUCKET_REGION= (region de aws donde se encuentra el bucket s3. Ej sa-east-1)
 
@@ -88,3 +93,11 @@ Crearle un permiso para que esta lambda pueda subir archivos a S3.
 Para esto tengo que entrar al rol de la lambda ("Configuration" -> "Execution role") y agregarle una politica.
 
 Esta politica tiene que tener el permiso _putObject_ y apuntar al bucket correspondiente.
+
+**Enviar eventos a SQS**
+
+Crearle un permiso para que esta lambda pueda emitir eventos a ciertas colas de SQS.
+
+Para esto tengo que entrar al rol de la lambda ("Configuration" -> "Execution role") y agregarle una politica.
+
+Esta politica tiene que tener el permiso _sqs:SendMessage_ y apuntar a la cola correspondiente (en este caso al SQS de posts)

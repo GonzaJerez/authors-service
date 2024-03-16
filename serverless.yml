@@ -27,7 +27,7 @@ functions:
       - httpApi:
           path: '/authors/{proxy+}'
           method: ANY
-      - sqs: arn:aws:sqs:sa-east-1:159107743549:authors-queue.fifo
+      - sqs: ${env:SQS_QUEUE_ARN}
     environment:
       NODE_ENV: prod
       SERVER_MODE: serverless
