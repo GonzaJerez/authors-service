@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { SchemaTypes, Types } from 'mongoose';
-import { IPost } from '../types/posts.types';
 
 @Schema({
   collection: 'authors',
@@ -22,7 +21,11 @@ export class Author {
   @Prop()
   image_url: string;
 
-  posts?: IPost[];
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  total_posts: number;
 }
 
 export const AuthorSchema = SchemaFactory.createForClass(Author);

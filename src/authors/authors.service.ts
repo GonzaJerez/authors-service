@@ -1,14 +1,13 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
-import { FilterQuery, Model } from 'mongoose';
-import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { Model } from 'mongoose';
+import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import { Author } from './entities/author.entity';
-import { AuthorFilterDto } from './dto/author-filter.dto';
 import { CreateAuthorDto } from './dto/create-author.dto';
-import { IPost } from './types/posts.types';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { IPost, TypeOperation } from './types/post-message';
 
 @Injectable()
 export class AuthorsService {
@@ -26,110 +25,15 @@ export class AuthorsService {
       author.image_url = url;
     }
 
-    return this.authorModel.create(author);
+    const authorCreated = await this.authorModel.create(author);
+
+    await this.notifyPostsService(authorCreated);
+
+    return authorCreated;
   }
 
-  async findAll(filters: AuthorFilterDto): Promise<Author[]> {
-    const { authors: authors_ids, relations } = filters;
-
-    // Filter authors by ids from request
-    const idsAuthors = authors_ids?.split(',');
-    const query: FilterQuery<Author> = {};
-    if (idsAuthors?.length > 0) {
-      query['_id'] = { $in: idsAuthors };
-    }
-
-    let authors: Author[] = await this.authorModel.find(query).lean();
-
-    if (relations?.includes('posts')) {
-      authors = await this.addPostsDataToAuthors(authors);
-    }
-
-    return authors;
-  }
-
-  private async addPostsDataToAuthors(authors: Author[]): Promise<Author[]> {
-    // Get ids of authors to filter posts on fetch
-    const authorsIds: string[] = authors.map((author) => author._id.toString());
-
-    // Get data from posts microservice
-    let posts: IPost[] = [];
-    try {
-      let resp: {
-        statusCode?: number;
-        message?: string;
-        posts?: IPost[];
-      };
-      if (this.configService.get('NODE_ENV') === 'prod') {
-        resp = await this.invokeLambda(`authors=${authorsIds.join(',')}`);
-      } else {
-        resp = await fetch(
-          `${this.configService.getOrThrow(
-            'POSTS_API_URL',
-          )}?authors=${authorsIds.join(',')}`,
-        ).then((res) => res.json());
-      }
-      if (!resp.posts)
-        throw new InternalServerErrorException(
-          'Error on get data from authors microservice',
-        );
-
-      posts = resp.posts;
-    } catch (error) {
-      console.log(error);
-    }
-
-    // If not recover data from posts microservice just return authors
-    if (posts.length === 0) return authors;
-
-    // Merge authors with their posts
-    const authorsWithPosts: Author[] = authors.map((author) => {
-      const postsByAuthor = posts.filter(
-        (post) => post.author === author._id.toString(),
-      );
-      return {
-        ...author,
-        posts: postsByAuthor,
-      };
-    });
-
-    return authorsWithPosts;
-  }
-
-  private async invokeLambda(queryString = '') {
-    const queryStringParameters: Record<string, string> = {};
-
-    const params = queryString.split('&');
-    for (const param of params) {
-      const [key, value] = param.split('=');
-      queryStringParameters[key] = value;
-    }
-
-    const client = new LambdaClient();
-    const command = new InvokeCommand({
-      FunctionName: this.configService.getOrThrow('POSTS_FUNCTION_NAME'),
-      Payload: JSON.stringify({
-        version: '2.0',
-        routeKey: '$default',
-        rawPath: '/posts',
-        rawQueryString: queryString,
-        queryStringParameters,
-        headers: {},
-        requestContext: {
-          http: {
-            method: 'GET',
-            path: `/posts?${queryString}`,
-            protocol: 'HTTP/1.1',
-          },
-        },
-      }),
-      InvocationType: 'RequestResponse',
-    });
-
-    const resp = await client.send(command);
-    const data = Buffer.from(resp.Payload).toString();
-    const dataParsed = JSON.parse(data);
-    return JSON.parse(dataParsed.body);
+  async findAll(): Promise<Author[]> {
+    return this.authorModel.find().lean();
   }
 
   private async uploadImage(file: Express.Multer.File) {
@@ -160,5 +64,39 @@ export class AuthorsService {
       ...uploadResponse,
       url,
     };
+  }
+
+  async handleMessage(operation: TypeOperation, post: IPost) {
+    let increment = 0;
+
+    if (operation === 'CREATE') increment += 1;
+    if (operation === 'DELETE') increment -= 1;
+
+    console.log({ increment });
+
+    const authorUpdated = await this.authorModel.findByIdAndUpdate(
+      post.author,
+      {
+        $inc: {
+          total_posts: increment,
+        },
+      },
+      { new: true },
+    );
+
+    console.log({ authorUpdated });
+  }
+
+  async notifyPostsService(author: Author) {
+    const client = new SQSClient({});
+    const command = new SendMessageCommand({
+      QueueUrl: this.configService.get('POSTS_QUEUE_URL'),
+      MessageAttributes: {},
+      MessageBody: JSON.stringify(author),
+      MessageGroupId: author._id.toString(),
+      MessageDeduplicationId: author._id.toString(),
+    });
+
+    await client.send(command);
   }
 }

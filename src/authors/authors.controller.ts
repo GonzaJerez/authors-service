@@ -6,13 +6,11 @@ import {
   MaxFileSizeValidator,
   ParseFilePipe,
   Post,
-  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthorsService } from './authors.service';
-import { AuthorFilterDto } from './dto/author-filter.dto';
 import { CreateAuthorDto } from './dto/create-author.dto';
 
 @Controller('authors')
@@ -39,8 +37,8 @@ export class AuthorsController {
   }
 
   @Get()
-  async findAll(@Query() filters: AuthorFilterDto) {
-    const authors = await this.authorsService.findAll(filters);
+  async findAll() {
+    const authors = await this.authorsService.findAll();
     return { authors };
   }
 }

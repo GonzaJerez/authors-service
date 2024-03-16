@@ -27,13 +27,14 @@ functions:
       - httpApi:
           path: '/authors/{proxy+}'
           method: ANY
+      - sqs: arn:aws:sqs:sa-east-1:159107743549:authors-queue.fifo
     environment:
-      MONGO_URI: ${env:MONGO_URI}
       NODE_ENV: prod
       SERVER_MODE: serverless
-      POSTS_FUNCTION_NAME: ${env:POSTS_FUNCTION_NAME}
+      MONGO_URI: ${env:MONGO_URI}
       AWS_BUCKET_NAME: ${env:AWS_BUCKET_NAME}
       AWS_BUCKET_REGION: ${env:AWS_BUCKET_REGION}
+      POSTS_QUEUE_URL: ${env:POSTS_QUEUE_URL}
 
 plugins:
   - serverless-offline

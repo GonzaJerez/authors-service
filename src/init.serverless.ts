@@ -1,26 +1,39 @@
 import { NestFactory } from '@nestjs/core';
+import { INestApplication } from '@nestjs/common';
 import { Callback, Context, Handler } from 'aws-lambda';
-import { AppModule } from './app.module';
 import serverlessExpress from '@codegenie/serverless-express';
+import { AppModule } from './app.module';
+import { AuthorsService } from './authors/authors.service';
 
-let server: Handler;
+let cachedServer: INestApplication;
 
-// Esta funcion retorna el inicio de la aplicación
-async function bootstrap(): Promise<Handler> {
-  const app = await NestFactory.create(AppModule);
-  await app.init();
+async function bootstrapServer(): Promise<INestApplication> {
+  if (!cachedServer) {
+    const nestApp = await NestFactory.create(AppModule);
 
-  const expressApp = app.getHttpAdapter().getInstance();
-  return serverlessExpress({ app: expressApp });
+    await nestApp.init();
+    cachedServer = nestApp;
+  }
+  return cachedServer;
 }
 
-// Funcion que ejecuta la lambda, comunica con la app de nestjs
 export const handler: Handler = async (
   event: any,
   context: Context,
   callback: Callback,
 ) => {
-  // Si ya esta inicializada la app no vuelve a inicializarla y usa la misma para q arranque mas rapido
-  server = server ?? (await bootstrap());
+  cachedServer = await bootstrapServer();
+
+  // Inicializar lambda consumer sqs
+  if (event.Records) {
+    const handler = cachedServer.get(AuthorsService);
+    const post = event.Records[0].body;
+    const operation = event.Records[0].messageAttributes.operation.stringValue;
+    return handler.handleMessage(operation, JSON.parse(post));
+  }
+
+  // Inicializar lambda http
+  const expressApp = cachedServer.getHttpAdapter().getInstance();
+  const server = serverlessExpress({ app: expressApp });
   return server(event, context, callback);
 };
