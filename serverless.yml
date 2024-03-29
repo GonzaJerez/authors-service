@@ -34,7 +34,7 @@ functions:
       MONGO_URI: ${env:MONGO_URI}
       AWS_BUCKET_NAME: ${env:AWS_BUCKET_NAME}
       AWS_BUCKET_REGION: ${env:AWS_BUCKET_REGION}
-      POSTS_QUEUE_URL: ${env:POSTS_QUEUE_URL}
+      SNS_TOPIC_ARN: ${env:SNS_TOPIC_ARN}
 
 plugins:
   - serverless-offline

@@ -27,9 +27,15 @@ export const handler: Handler = async (
   // Inicializar lambda consumer sqs
   if (event.Records) {
     const handler = cachedServer.get(AuthorsService);
-    const post = event.Records[0].body;
-    const operation = event.Records[0].messageAttributes.operation.stringValue;
-    return handler.handleMessage(operation, JSON.parse(post));
+    const body = JSON.parse(event.Records[0].body ?? '{}');
+    const post = JSON.parse(body.Message ?? '{}');
+    const operation = body?.MessageAttributes?.operation?.Value;
+
+    if (operation === 'SEED') {
+      return handler.generateSeed();
+    }
+
+    return handler.handleMessage(operation, post);
   }
 
   // Inicializar lambda http

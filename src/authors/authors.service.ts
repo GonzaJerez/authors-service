@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { Model } from 'mongoose';
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import bcrypt from 'bcryptjs';
 
 import { Author } from './entities/author.entity';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { IPost, TypeOperation } from './types/post-message';
+import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
 
 @Injectable()
 export class AuthorsService {
@@ -18,16 +19,20 @@ export class AuthorsService {
   ) {}
 
   async create(body: CreateAuthorDto, file?: Express.Multer.File) {
-    const author = new this.authorModel(body);
+    const author = new this.authorModel({
+      ...body,
+      password: bcrypt.hashSync(body.password, 10),
+    });
 
     if (file) {
       const { url } = await this.uploadImage(file);
       author.image_url = url;
     }
+    console.log({ author });
 
     const authorCreated = await this.authorModel.create(author);
 
-    await this.notifyPostsService(authorCreated);
+    await this.notifyChangeAuthors([authorCreated], 'CREATE');
 
     return authorCreated;
   }
@@ -83,14 +88,29 @@ export class AuthorsService {
     );
   }
 
-  async notifyPostsService(author: Author) {
-    const client = new SQSClient({});
-    const command = new SendMessageCommand({
-      QueueUrl: this.configService.get('POSTS_QUEUE_URL'),
-      MessageAttributes: {},
-      MessageBody: JSON.stringify(author),
-      MessageGroupId: author._id.toString(),
-      MessageDeduplicationId: author._id.toString(),
+  async generateSeed() {
+    const authors = await this.authorModel.find().lean();
+
+    this.notifyChangeAuthors(authors, 'SEED');
+  }
+
+  async notifyChangeAuthors(
+    authors: Author[],
+    operation: 'CREATE' | 'UPDATE' | 'DELETE' | 'SEED',
+  ) {
+    const client = new SNSClient({});
+    const fifoId = crypto.randomUUID();
+    const command = new PublishCommand({
+      Message: JSON.stringify(authors),
+      TopicArn: this.configService.get('SNS_TOPIC_ARN'),
+      MessageAttributes: {
+        operation: {
+          DataType: 'String',
+          StringValue: operation,
+        },
+      },
+      MessageGroupId: fifoId,
+      MessageDeduplicationId: fifoId,
     });
 
     await client.send(command);

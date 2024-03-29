@@ -22,6 +22,14 @@ export class Author {
   image_url: string;
 
   @Prop({
+    unique: true,
+  })
+  email: string;
+
+  @Prop()
+  password: string;
+
+  @Prop({
     type: Number,
     default: 0,
   })
