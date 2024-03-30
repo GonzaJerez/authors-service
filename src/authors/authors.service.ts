@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { Model } from 'mongoose';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 
 import { Author } from './entities/author.entity';
 import { CreateAuthorDto } from './dto/create-author.dto';
@@ -26,9 +26,10 @@ export class AuthorsService {
 
     if (file) {
       const { url } = await this.uploadImage(file);
+      console.log({ url });
+
       author.image_url = url;
     }
-    console.log({ author });
 
     const authorCreated = await this.authorModel.create(author);
 
@@ -88,15 +89,9 @@ export class AuthorsService {
     );
   }
 
-  async generateSeed() {
-    const authors = await this.authorModel.find().lean();
-
-    this.notifyChangeAuthors(authors, 'SEED');
-  }
-
   async notifyChangeAuthors(
     authors: Author[],
-    operation: 'CREATE' | 'UPDATE' | 'DELETE' | 'SEED',
+    operation: 'CREATE' | 'UPDATE' | 'DELETE',
   ) {
     const client = new SNSClient({});
     const fifoId = crypto.randomUUID();

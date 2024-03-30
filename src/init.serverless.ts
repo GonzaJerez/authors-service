@@ -31,10 +31,6 @@ export const handler: Handler = async (
     const post = JSON.parse(body.Message ?? '{}');
     const operation = body?.MessageAttributes?.operation?.Value;
 
-    if (operation === 'SEED') {
-      return handler.generateSeed();
-    }
-
     return handler.handleMessage(operation, post);
   }
 
