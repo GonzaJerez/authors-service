@@ -20,6 +20,10 @@ Asegurarse de tener instalado en su sistema:
 
 Un bucket S3 de destino. Este bucket debe tener acceso publico (Habilitar acceso publico y ademas establecer politicas para este acceso publico)
 
+## SNS
+
+Un topic donde se publicaran los eventos que dispare este servicio.
+
 ### SQS
 
 Una cola donde se reciban todos los eventos que le interesan a este servicio. Para el ejemplo se configuro un SQS de tipo "fifo".
@@ -68,7 +72,7 @@ Crear archivo `.env.prod` y configurar las variables de entorno necesarias para 
 - MONGO_URI=... (string de conexion a base de datos de MongoDB con su nombre de usuario y contraseña)
 - API_GATEWAY_ID= (id de api gateway creado)
 - SQS_QUEUE_ARN= (arn de la cola de sqs que le emite eventos a esta lambda)
-- POSTS_QUEUE_URL= (URL de la queue del servicio de posts para poder enviarle mensajes)
+- SNS_TOPIC_ARN= (ARN del topic donde se van a publicar los eventos que emita este servicio)
 - AWS_BUCKET_NAME= (nombre del bucket de s3 al que se van a subir los archivos)
 - AWS_BUCKET_REGION= (region de aws donde se encuentra el bucket s3. Ej sa-east-1)
 
@@ -78,14 +82,6 @@ Crear archivo `.env.prod` y configurar las variables de entorno necesarias para 
 
 #### Permisos
 
-**Permitir invocaciones de lambdas**
-
-Una vez desplegado este servicio configurar los permisos de la lambda para que otras lambdas puedan invocarla.
-
-Para esto ir a "Configuration" -> "Permissions" -> "Resource-based policy statements" -> "Add permission" -> Se le asigna nombre al permiso, se agrega la arn **del rol de la lambda que haria la invocacion a esta _(en este caso la arn del permiso de la lambda de posts)_**, y selecciono el permiso al que se le da acceso: **lambda:invokeFunction**.
-
-De esta forma esta lambda puede ser invokada por cualquier lambda que tenga el rol seleccionado (en este caso la lambda de posts)
-
 **Subir archivos a bucket S3**
 
 Crearle un permiso para que esta lambda pueda subir archivos a S3.
@@ -94,10 +90,10 @@ Para esto tengo que entrar al rol de la lambda ("Configuration" -> "Execution ro
 
 Esta politica tiene que tener el permiso _putObject_ y apuntar al bucket correspondiente.
 
-**Enviar eventos a SQS**
+**Enviar eventos a SNS topic**
 
-Crearle un permiso para que esta lambda pueda emitir eventos a ciertas colas de SQS.
+Crearle un permiso para que esta lambda pueda emitir eventos a ciertos topics de SNS.
 
 Para esto tengo que entrar al rol de la lambda ("Configuration" -> "Execution role") y agregarle una politica.
 
-Esta politica tiene que tener el permiso _sqs:SendMessage_ y apuntar a la cola correspondiente (en este caso al SQS de posts)
+Esta politica tiene que tener el permiso _sns:Publish_ y apuntar al topic correspondiente (en este caso al de authors)

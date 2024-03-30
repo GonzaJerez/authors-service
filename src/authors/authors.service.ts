@@ -26,8 +26,6 @@ export class AuthorsService {
 
     if (file) {
       const { url } = await this.uploadImage(file);
-      console.log({ url });
-
       author.image_url = url;
     }
 
