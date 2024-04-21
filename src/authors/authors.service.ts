@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { Model } from 'mongoose';
@@ -19,6 +19,13 @@ export class AuthorsService {
   ) {}
 
   async create(body: CreateAuthorDto, file?: Express.Multer.File) {
+    const isEmailAlreadyInUse = await this.authorModel.findOne({
+      email: body.email,
+    });
+    if (isEmailAlreadyInUse) {
+      throw new ForbiddenException('Email already in use');
+    }
+
     const author = new this.authorModel({
       ...body,
       password: bcrypt.hashSync(body.password, 10),
@@ -92,7 +99,6 @@ export class AuthorsService {
     operation: 'CREATE' | 'UPDATE' | 'DELETE',
   ) {
     const client = new SNSClient({});
-    const fifoId = crypto.randomUUID();
     const command = new PublishCommand({
       Message: JSON.stringify(authors),
       TopicArn: this.configService.get('SNS_TOPIC_ARN'),
@@ -102,8 +108,6 @@ export class AuthorsService {
           StringValue: operation,
         },
       },
-      MessageGroupId: fifoId,
-      MessageDeduplicationId: fifoId,
     });
 
     await client.send(command);
