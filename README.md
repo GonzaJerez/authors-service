@@ -42,10 +42,8 @@ Renombrar archivo ".env.example" a ".env" y configurar las variables de entorno 
 
 Crear archivo `.env.prod` y configurar las variables de entorno necesarias para produccion
 
-- MONGO_URI=... (string de conexion a base de datos de MongoDB con su nombre de usuario y contraseña)
-- NODE_ENV=prod
-- SERVER_MODE=serverless
-- POSTS_API_URL= (Si ya se sabe la url del microservicio de posts agregarlo en este archivo, sino configurarlo despues en consola de aws)
+- MONGO_URI= string de conexion a base de datos de MongoDB con su nombre de usuario y contraseña
+- POSTS_API_URL= si ya se sabe la url del microservicio de posts agregarlo en este archivo, sino configurarlo despues en consola de aws
 
 #### Deploy
 

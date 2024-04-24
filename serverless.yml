@@ -21,8 +21,9 @@ functions:
     timeout: 15
     environment:
       MONGO_URI: ${env:MONGO_URI}
-      NODE_ENV: ${env:NODE_ENV}
-      SERVER_MODE: ${env:SERVER_MODE}
+      POSTS_API_URL: ${env:POSTS_API_URL}
+      NODE_ENV: prod
+      SERVER_MODE: serverless
 
 plugins:
   - serverless-offline
