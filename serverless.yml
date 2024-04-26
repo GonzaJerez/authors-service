@@ -29,6 +29,7 @@ functions:
           method: ANY
     environment:
       MONGO_URI: ${env:MONGO_URI}
+      POSTS_FUNCTION_NAME: ${env:POSTS_FUNCTION_NAME}
       NODE_ENV: prod
       SERVER_MODE: serverless
 
