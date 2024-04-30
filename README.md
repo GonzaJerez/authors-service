@@ -52,9 +52,7 @@ Crear archivo `.env.prod` y configurar las variables de entorno necesarias para 
 
 #### Permisos
 
-Una vez desplegado este servicio configurar los permisos de la lambda para que otras lambdas puedan invocarla.
-
-Puede hacerse de 2 maneras, dandole permisos a las lambdas para que puedan invocar a otras o diciendole a las lambdas que otras funciones pueden invocarla.
+Una vez desplegado este servicio configurar los permisos de la lambda para que otras lambdas puedan invocarla. Esto puede hacerse de 2 maneras, dandole permisos a las lambdas para que puedan invocar a otras o diciendole a las lambdas que otras funciones pueden invocarla.
 
 Para la primera opción ir a "Configuration" -> "Permissions" -> "Execution role" -> "Role name" -> Selecciono el rol para ir a la configuración del mismo -> agrego la politica **lambda:invokeFunction** al rol y especifico las funciones lambda que puede invocar.
 
