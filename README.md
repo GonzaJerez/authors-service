@@ -61,11 +61,11 @@ Renombrar archivo ".env.example" a ".env" y configurar las variables de entorno 
 
 Crear archivo `.env.prod` y configurar las variables de entorno necesarias para produccion
 
-- MONGO_URI=... (string de conexion a base de datos de MongoDB con su nombre de usuario y contraseña)
-- API_GATEWAY_ID= (id de api gateway creado)
-- POSTS_FUNCTION_NAME= (Si ya se sabe el nombre de la lambda de posts agregarlo en este archivo, sino configurarlo despues en consola de aws)
-- AWS_BUCKET_NAME= (nombre del bucket de s3 al que se van a subir los archivos)
-- AWS_BUCKET_REGION= (region de aws donde se encuentra el bucket s3. Ej sa-east-1)
+- MONGO_URI= string de conexion a base de datos de MongoDB con su nombre de usuario y contraseña
+- API_GATEWAY_ID= id de api gateway creado
+- POSTS_FUNCTION_NAME= Si ya se sabe el nombre de la lambda de posts agregarlo en este archivo, sino configurarlo despues en consola de aws
+- AWS_BUCKET_NAME= nombre del bucket de s3 al que se van a subir los archivos
+- AWS_BUCKET_REGION= region de aws donde se encuentra el bucket s3. Ej sa-east-1
 
 #### Deploy
 
@@ -73,11 +73,15 @@ Crear archivo `.env.prod` y configurar las variables de entorno necesarias para 
 
 #### Permisos
 
-**Permitir invocaciones de lambdas**
+**Invocaciones de lambdas**
 
-Una vez desplegado este servicio configurar los permisos de la lambda para que otras lambdas puedan invocarla.
+Una vez desplegado este servicio configurar los permisos de la lambda para que otras lambdas puedan invocarla. Esto puede hacerse de 2 maneras, dandole permisos a las lambdas para que puedan invocar a otras o diciendole a las lambdas que otras funciones pueden invocarla.
 
-Para esto ir a "Configuration" -> "Permissions" -> "Resource-based policy statements" -> "Add permission" -> Se le asigna nombre al permiso, se agrega la arn **del rol de la lambda que haria la invocacion a esta _(en este caso la arn del permiso de la lambda de posts)_**, y selecciono el permiso al que se le da acceso: **lambda:invokeFunction**.
+Para la primera opción ir a "Configuration" -> "Permissions" -> "Execution role" -> "Role name" -> Selecciono el rol para ir a la configuración del mismo -> agrego la politica **lambda:invokeFunction** al rol y especifico las funciones lambda que puede invocar.
+
+De esta forma esta lambda ya puede invocar otras lambdas.
+
+Para la segunda opción ir a "Configuration" -> "Permissions" -> "Resource-based policy statements" -> "Add permission" -> Se le asigna nombre al permiso, se agrega la arn **del rol de la lambda que haria la invocacion a esta _(en este caso la arn del permiso de la lambda de posts)_**, y selecciono el permiso al que se le da acceso: **lambda:invokeFunction**.
 
 De esta forma esta lambda puede ser invokada por cualquier lambda que tenga el rol seleccionado (en este caso la lambda de posts)
 
